@@ -126,6 +126,31 @@ for ts, buf in pcap:
     #         suspects[srcIP]['SCAN_TYPE'] = "TCP SYN"
 
 
+# Output results.
+print("Analyzed", curPacket, "packets:")
+
+if not suspects:
+    print('no suspicious packets detected...')
+
+for s in sorted(suspects.keys(), key=cmp_to_key(compare_IPs)):
+    syns = suspects[s]['SYN']
+    synacks = suspects[s]['SYN-ACK']
+    acks = suspects[s]['ACK']
+    rsts = suspects[s]['RST']
+    icmps = suspects[s]['ICMP']
+    scan_type = suspects[s]['SCAN_TYPE']
+    ports = ', '.join(str(x) for x in suspects[s]['PORT_LIST'])
+    duration = datetime.utcfromtimestamp(suspects[s]['SCAN_STOP']) - datetime.utcfromtimestamp(suspects[s]['SCAN_START'])
+    duration_in_s = duration.total_seconds()
+    # ports.sort()
+    timestamps = suspects[s]['TIMESTAMP_LIST']
+
+
+    if syns + synacks + acks + icmps < 20:
+        continue
+
+
+
 
 
 
