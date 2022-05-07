@@ -35,3 +35,19 @@ def compare_IPs(ip1, ip2):
     """
     return sum(map(int, ip1.split('.'))) - sum(map(int, ip2.split('.')))
 
+# =ARG PARSING=================================================================#
+
+# Must include a pcap to read from.
+if len(sys.argv) <= 1:
+    print(f"{0}: needs a filepath to a PCAP file".format(sys.argv[0]))
+    sys.exit(-1)
+
+# Try to open the pcap file and create a pcap.Reader object.
+try:
+    f = open(sys.argv[1], 'rb')
+    pcap = dpkt.pcap.Reader(f)
+except (IOError, KeyError):
+    print(f"Cannot open file: {0}".format(sys.argv[1]))
+    sys.exit(-1)
+
+
