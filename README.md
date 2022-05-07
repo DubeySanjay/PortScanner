@@ -1,0 +1,2 @@
+# PortScanner
+A port scanner is a program that automatically detects security weaknesses in a remote or localhost. When hackers attack a site, they often try each port in turn to see which are available and not blocked by a firewall or TCP wrapper. This scan can be recognized by a series of packets from one host to another in a short period of time. Port scans are aimed at many different ports, often in an increasing or decreasing sequence. This project involves the implementation of a port scan detector.
