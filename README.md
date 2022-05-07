@@ -31,7 +31,7 @@ IV. requirement.txt: environment to be installed
 V. Technical analysis: Initial analysis apart from python and interpretation. 
 
 
-STEPS:
+#STEPS:
 
 a. Unarchive zip file.
 
