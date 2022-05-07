@@ -25,9 +25,13 @@ For the data visualization, it is used matplotlib and the information plotted is
 #Project contain:
 
 I. main.py : Python file
+
 II. Documentation.txt: report
+
 III. output.txt: sample output
+
 IV. requirement.txt: environment to be installed
+
 V. Technical analysis: Initial analysis apart from python and interpretation. 
 
 
