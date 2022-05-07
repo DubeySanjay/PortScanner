@@ -22,8 +22,9 @@ For the attack duration we can just calculate  the timestamp of the last packet 
 
 For the data visualization, it is used matplotlib and the information plotted is the pair (timestamp of the packet + packet type), where packet type is either SYN, ACK, SYN-ACK, RST or ICMP
 
-Project contain:
-I. Acknowledge
+#Project contain:
+
+I. main.py : Python file
 II. Documentation.txt: report
 III. output.txt: sample output
 IV. requirement.txt: environment to be installed
