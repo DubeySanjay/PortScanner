@@ -4,6 +4,7 @@ A port scanner is a program that automatically detects security weaknesses in a 
 #If you reached till here, you have made it.
 
 #Documentation
+
 The applications is parsing the entire pcap file entry by entry and storing metadatas in a dictionary as:
 	Key: IP address of the scanner
 	Value:  - count of all flags (SYN, ACK, SYN-ACK, RST, ICMP)
