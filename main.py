@@ -166,6 +166,15 @@ for s in sorted(suspects.keys(), key=cmp_to_key(compare_IPs)):
     plt.title(s + " - " + scan_type)
     plt.show()
 
+    # printing with timestamps
+    # print("{0:15} had SYNs {1} SYN-ACKs {2} ACKs {3} RSTs {4} ICMPs {5} \nPORTS SCANNED = {6}\nTIMESTAMPS = {7}\n"
+    #       "=======================================================================\n"
+    #       .format(s, syns, synacks, acks, rsts, icmps, ports, timestamps))
 
+    # printing without timestamps
+    print("{0:15} had SYNs {1} SYN-ACKs {2} ACKs {3} ICMPs {4} \nSCAN TYPE = {5} \nScan duration {6} \n"
+          "PORTS SCANNED = {7}\n"
+          "=======================================================================\n"
+          .format(s, syns, synacks, acks, icmps,scan_type,duration_in_s,  ports))
 
 
