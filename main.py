@@ -149,7 +149,22 @@ for s in sorted(suspects.keys(), key=cmp_to_key(compare_IPs)):
     if syns + synacks + acks + icmps < 20:
         continue
 
+#  plotting
+    data = {'SYN': syns, 'SYN-ACK': synacks, 'ACK': acks,
+            'PING': icmps}
+    signals = list(data.keys())
+    signal_count = list(data.values())
 
+    fig = plt.figure(figsize=(10, 5))
+
+    # creating the bar plot
+    plt.bar(signals, signal_count, color='maroon',
+            width=0.4)
+
+    plt.xlabel("Signals")
+    plt.ylabel("No. of signals")
+    plt.title(s + " - " + scan_type)
+    plt.show()
 
 
 
