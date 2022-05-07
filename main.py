@@ -49,5 +49,83 @@ try:
 except (IOError, KeyError):
     print(f"Cannot open file: {0}".format(sys.argv[1]))
     sys.exit(-1)
+# =MAIN========================================================================#
+
+suspects = dict()  # Dictionary of suspects. suspect's IP: {# SYNs, # SYN-ACKs}
+curPacket = 0  # Current packet number.
+
+# Analyze captured packets.
+for ts, buf in pcap:
+    curPacket += 1
+
+    # Ignore malformed packets
+    try:
+        eth = dpkt.ethernet.Ethernet(buf)
+    except (dpkt.dpkt.UnpackError, IndexError):
+        continue
+
+    # Packet must include IP protocol to get TCP
+    ip = eth.data
+    if not ip:
+        continue
+
+    # Skip packets that are not TCP
+    tcp = ip.data
+    if type(tcp) != dpkt.tcp.TCP:
+        continue
+
+    # Get all of the set flags in this TCP packet
+    tcpFlag = tcpFlags(tcp)
+
+    srcIP = socket.inet_ntoa(ip.src)
+    dstIP = socket.inet_ntoa(ip.dst)
+
+    # test if the packet is icmp (ping)
+    if isinstance(ip.data, dpkt.icmp.ICMP):
+        if srcIP not in suspects:
+            suspects[srcIP] = {'SYN': 0, 'SYN-ACK': 0, 'RST': 0, 'ACK': 0, 'ICMP': 0, 'PORT_LIST': set(), 'TIMESTAMP_LIST': [(ts, 'ICMP')], 'SCAN_TYPE': "PING", 'SCAN_PHASE':"PING", 'SCAN_START': ts, 'SCAN_STOP':ts}
+        suspects[srcIP]['ICMP'] += 1
+
+    # Fingerprint possible suspects.
+    if {'SYN'} == set(tcpFlag):  # A 'SYN' request.
+        if srcIP not in suspects:
+            suspects[srcIP] = {'SYN': 0, 'SYN-ACK': 0, 'RST': 0, 'ACK': 0, 'ICMP': 0, 'PORT_LIST': set(), 'TIMESTAMP_LIST': [(ts, 'SYN')], 'SCAN_TYPE': "TCP SYN", 'SCAN_PHASE':"SYN", 'SCAN_START': ts, 'SCAN_STOP':ts}
+        suspects[srcIP]['SYN'] += 1
+        suspects[srcIP]['PORT_LIST'].add(tcp.dport)
+        suspects[srcIP]['TIMESTAMP_LIST'].append((ts, 'SYN'))
+        suspects[srcIP]['SCAN_STOP'] = ts
+        suspects[srcIP]['SCAN_PHASE'] = 'SYN'
+
+    elif {'SYN', 'ACK'} == set(tcpFlag):  # A 'SYN-ACK' reply.
+        if dstIP not in suspects:
+            suspects[dstIP] = {'SYN': 0, 'SYN-ACK': 0, 'RST': 0, 'ACK': 0, 'ICMP': 0, 'PORT_LIST': set(), 'TIMESTAMP_LIST': [(ts, 'SYN-ACK')], 'SCAN_TYPE': "", 'SCAN_PHASE':"SYN-ACK", 'SCAN_START': ts, 'SCAN_STOP':ts}
+        suspects[dstIP]['SYN-ACK'] += 1
+        suspects[dstIP]['SCAN_STOP'] = ts
+        if suspects[dstIP]['SCAN_PHASE'] == "SYN":
+            suspects[dstIP]['SCAN_TYPE'] = "TCP SYN"
+        suspects[dstIP]['SCAN_PHASE'] = "SYN-ACK"
+
+    elif {'ACK'} == set(tcpFlag):
+        if srcIP not in suspects:
+            suspects[srcIP] = {'SYN': 0, 'SYN-ACK': 0, 'RST': 0, 'ACK': 0, 'ICMP': 0, 'PORT_LIST': set(), 'TIMESTAMP_LIST': [(ts, 'ACK')], 'SCAN_TYPE': "", 'SCAN_PHASE':"ACK", 'SCAN_START': ts, 'SCAN_STOP':ts}
+        suspects[srcIP]['ACK'] += 1
+        suspects[srcIP]['PORT_LIST'].add(tcp.dport)
+        suspects[srcIP]['TIMESTAMP_LIST'].append((ts, 'ACK'))
+        suspects[srcIP]['SCAN_STOP'] = ts
+        if suspects[srcIP]['SCAN_PHASE'] == "SYN-ACK":
+            suspects[srcIP]['SCAN_TYPE'] = "TCP CONNECT SCAN"
+        else:
+            suspects[srcIP]['SCAN_TYPE'] = "ACK SCAN"
+        suspects[srcIP]['SCAN_PHASE'] = "ACK"
+
+    # elif {'RST'} == set(tcpFlag):
+    #     suspects[srcIP]['RST'] += 1
+    #     suspects[srcIP]['SCAN_STOP'] = ts
+    #
+    #     if suspects[srcIP]['SCAN_PHASE'] == "ACK":
+    #         suspects[srcIP]['SCAN_TYPE'] = "TCP SYN"
+
+
+
 
 
